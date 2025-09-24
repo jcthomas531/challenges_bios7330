@@ -1,6 +1,6 @@
 #r-cran-data.table
 #this can probably be improved by increasing step size
-CSV_Col_Means <- function(fname, stepSize = 99999) {
+CSV_Col_Means <- function(fname, stepSize = 125009) {
   stepSize <- stepSize
   sumHolder <- 0
   nHolder <- 0
