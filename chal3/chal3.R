@@ -1,5 +1,5 @@
 MGS <- function(x) {
-  qr.Q(qr(x, LAPACK = FALSE))
+  qr.Q(qr(x, LAPACK = TRUE))
 }
   
 
