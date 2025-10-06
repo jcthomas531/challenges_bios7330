@@ -52,7 +52,7 @@ microbenchmark::microbenchmark(MGS(X))
 #build in option
 qr(X)
 tail(qr.Q(qr(X)))
-microbenchmark::microbenchmark(qr.Q(qr(X)))
+microbenchmark::microbenchmark(qr.Q(qr(X, LAPACK = FALSE)))
 
 #from rfast
 tail(pracma::gramSchmidt(X)$Q)
