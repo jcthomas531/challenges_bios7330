@@ -67,12 +67,22 @@ MGS_Big <- function(fname, out) {
   close(con)
   writeLines(header, con = out)
   for (j in 1:numChunks) {
-    #get the chunk of the RstackQ that we need
-    indOffset <- (j-1)*stride
-    RstackQj <- RstackQ[(indOffset+1):(indOffset+stride),]
-    #read in the corresponding Qj
+    start <- (j - 1) * stride + 1
+    end   <- min(start + stride - 1, nrow(RstackQ))  # clamp to max rows
+    
+    # slice safely (drop = FALSE avoids vector drop if single row)
+    RstackQj <- RstackQ[start:end, , drop = FALSE]
+    
+    # load corresponding Q
     Qj <- readRDS(Qfiles[j])
-    #writing
+    
+    # sanity check: ensure dimension compatibility before multiplying
+    # if (ncol(Qj) != nrow(RstackQj)) {
+    #   stop(sprintf("Dimension mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
+    #                j, ncol(Qj), nrow(RstackQj)))
+    # }
+    
+    # write results
     data.table::fwrite(
       data.table::as.data.table(Qj %*% RstackQj),
       file = out,
