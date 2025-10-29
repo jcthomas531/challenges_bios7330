@@ -15,7 +15,7 @@ MGS_Big <- function(fname, out) {
   i <- 0
   repeat {
     i <- i + 1
-    linesi <- readLines(con, n=50000)
+    linesi <- readLines(con, n=10000)
     if (length(linesi) == 0) {break}
     chunki <- data.table::fread(text = paste(linesi, collapse = "\n")) |>
       as.matrix()
@@ -44,9 +44,7 @@ MGS_Big <- function(fname, out) {
 
 
   #step 3 do the qr decomp on the R stack, only care about the Q
-  RstackQR <- qr(Rstack)
-  RstackQ  <- qr.Q(RstackQR, complete = TRUE)
-  rankR    <- RstackQR$rank
+  RstackQ <- qr.Q(qr(Rstack))
 
 
   #step 4, bring in each Q individually and mutliply it by the RstackQ and output it
@@ -56,7 +54,13 @@ MGS_Big <- function(fname, out) {
   #in the original matrix but it seems to be working...
   numChunks <- i - 1
   #stride <- ncol(RstackQ) #nrow(RstackQ)/numChunks
-  stride <- floor(nrow(RstackQ) / numChunks)
+  ##############################################################################
+  #via chatgpt
+  stride <- nrow(RstackQ) / numChunks
+  if (abs(stride - round(stride)) > 1e-8)
+    stop("Chunk dimensions do not divide evenly — check column counts.")
+  stride <- as.integer(round(stride))
+  ##############################################################################
   
   
   #this should preserve order
@@ -69,16 +73,12 @@ MGS_Big <- function(fname, out) {
   close(con)
   writeLines(header, con = out)
   for (j in 1:numChunks) {
-    start <- (j - 1) * stride + 1
-    end   <- min(start + stride - 1, nrow(RstackQ))
-    RstackQj <- RstackQ[start:end, 1:rankR, drop = FALSE]
-    Qj <- readRDS(Qfiles[j])[, 1:rankR, drop = FALSE]
-    
-    if (ncol(Qj) != nrow(RstackQj)) {
-      stop(sprintf("Still mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
-                   j, ncol(Qj), nrow(RstackQj)))
-    }
-    
+    #get the chunk of the RstackQ that we need
+    indOffset <- (j-1)*stride
+    RstackQj <- RstackQ[(indOffset+1):(indOffset+stride),]
+    #read in the corresponding Qj
+    Qj <- readRDS(Qfiles[j])
+    #writing
     data.table::fwrite(
       data.table::as.data.table(Qj %*% RstackQj),
       file = out,
