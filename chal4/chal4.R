@@ -15,7 +15,7 @@ MGS_Big <- function(fname, out) {
   i <- 0
   repeat {
     i <- i + 1
-    linesi <- readLines(con, n=1000)
+    linesi <- readLines(con, n=50000)
     if (length(linesi) == 0) {break}
     chunki <- data.table::fread(text = paste(linesi, collapse = "\n")) |>
       as.matrix()
