@@ -54,13 +54,7 @@ MGS_Big <- function(fname, out) {
   #in the original matrix but it seems to be working...
   numChunks <- i - 1
   #stride <- ncol(RstackQ) #nrow(RstackQ)/numChunks
-  ##############################################################################
-  #via chatgpt
-  stride <- nrow(RstackQ) / numChunks
-  if (abs(stride - round(stride)) > 1e-8)
-    stop("Chunk dimensions do not divide evenly — check column counts.")
-  stride <- as.integer(round(stride))
-  ##############################################################################
+  stride <- floor(nrow(RstackQ) / numChunks)
   
   
   #this should preserve order
