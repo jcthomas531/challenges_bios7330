@@ -44,7 +44,9 @@ MGS_Big <- function(fname, out) {
 
 
   #step 3 do the qr decomp on the R stack, only care about the Q
-  RstackQ <- qr.Q(qr(Rstack))
+  RstackQR <- qr(Rstack)
+  RstackQ  <- qr.Q(RstackQR, complete = TRUE)
+  rankR    <- RstackQR$rank
 
 
   #step 4, bring in each Q individually and mutliply it by the RstackQ and output it
@@ -68,21 +70,15 @@ MGS_Big <- function(fname, out) {
   writeLines(header, con = out)
   for (j in 1:numChunks) {
     start <- (j - 1) * stride + 1
-    end   <- min(start + stride - 1, nrow(RstackQ))  # clamp to max rows
+    end   <- min(start + stride - 1, nrow(RstackQ))
+    RstackQj <- RstackQ[start:end, 1:rankR, drop = FALSE]
+    Qj <- readRDS(Qfiles[j])[, 1:rankR, drop = FALSE]
     
-    # slice safely (drop = FALSE avoids vector drop if single row)
-    RstackQj <- RstackQ[start:end, , drop = FALSE]
-    
-    # load corresponding Q
-    Qj <- readRDS(Qfiles[j])
-    
-    #sanity check: ensure dimension compatibility before multiplying
     if (ncol(Qj) != nrow(RstackQj)) {
-      stop(sprintf("Dimension mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
+      stop(sprintf("Still mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
                    j, ncol(Qj), nrow(RstackQj)))
     }
     
-    # write results
     data.table::fwrite(
       data.table::as.data.table(Qj %*% RstackQj),
       file = out,
