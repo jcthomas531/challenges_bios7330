@@ -76,11 +76,11 @@ MGS_Big <- function(fname, out) {
     # load corresponding Q
     Qj <- readRDS(Qfiles[j])
     
-    # sanity check: ensure dimension compatibility before multiplying
-    # if (ncol(Qj) != nrow(RstackQj)) {
-    #   stop(sprintf("Dimension mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
-    #                j, ncol(Qj), nrow(RstackQj)))
-    # }
+    #sanity check: ensure dimension compatibility before multiplying
+    if (ncol(Qj) != nrow(RstackQj)) {
+      stop(sprintf("Dimension mismatch at chunk %d: Qj has %d cols, RstackQj has %d rows",
+                   j, ncol(Qj), nrow(RstackQj)))
+    }
     
     # write results
     data.table::fwrite(
