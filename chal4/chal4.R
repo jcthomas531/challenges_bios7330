@@ -5,6 +5,14 @@
 
 #r-cran-data.table, r-cran-stringr
 #find on: https://packages.ubuntu.com/
+
+#this was successful, but it is touchy. the stride and the chunk size at the very
+#last step are inelligent. There is a section from chatgpt in there (noted) that
+#not be necessary. I believe this will work without it as all the Q matrices should
+#be pxp. This works perfectly on smaller test data sets that I tried. also if i 
+#were to change something, i would explicitly order incoming files rather than 
+#relying on the machines ordering system
+
 MGS_Big <- function(fname, out) {
   #step 1 read in all chuncks and output Q and R matrices
   #readLines can read unitl failure and whener we get a length of 0 then break
@@ -15,7 +23,7 @@ MGS_Big <- function(fname, out) {
   i <- 0
   repeat {
     i <- i + 1
-    linesi <- readLines(con, n=10000)
+    linesi <- readLines(con, n=30001)
     if (length(linesi) == 0) {break}
     chunki <- data.table::fread(text = paste(linesi, collapse = "\n")) |>
       as.matrix()

@@ -6,7 +6,7 @@ MGS_Big <- function(fname, out) {
   i <- 0
   repeat {
     i <- i + 1
-    linesi <- readLines(con, n = 20000)  # tune chunk size (e.g., 10000–50000)
+    linesi <- readLines(con, n = 20004)  # tune chunk size (e.g., 10000–50000)
     if (length(linesi) == 0) break
     
     chunki <- data.table::fread(text = paste(linesi, collapse = "\n")) |>
@@ -44,7 +44,7 @@ MGS_Big <- function(fname, out) {
   Qfiles <- list.files(pattern = "kangarooQ")
   
   # STEP 5 — Blockwise multiplication to control memory
-  blockSize <- 500  # number of columns to multiply at once
+  blockSize <- 200  # number of columns to multiply at once
   
   for (j in 1:numChunks) {
     start <- (j - 1) * stride + 1

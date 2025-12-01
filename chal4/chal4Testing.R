@@ -204,7 +204,7 @@ csize
 
 ################################################################################
 #testing function
-nr <- sample(10000:50000, 1)
+nr <- sample(300000, 1)
 nc <- sample(25:50, 1)
 set.seed(826)
 dat <- matrix(data = rnorm(nr*nc), nrow = nr, ncol = nc)
