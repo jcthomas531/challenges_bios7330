@@ -53,7 +53,7 @@ FitGompertz <- function(gdat) {
       } 
     
     
-    return(l)
+    return(-l)
   }
   
   
@@ -74,6 +74,15 @@ FitGompertz <- function(gdat) {
   # if (edgeClose < 1) {
   #   stop(paste0(which.min(edgeClose)), " is too close to boundary: ", min(edgeClose))
   # }
+  
+  
+  
+  
+  #thoughts from other peoples presentations:
+  #use dnorm instead of manually making the log likelihood
+  #use the gradient, whether by hand or automatic (try torch)
+  #TMB::MakeADFun allows custom fitting things, DLL = "GompertzFit" might be custom might be prebuilt
+  
   
   
   
