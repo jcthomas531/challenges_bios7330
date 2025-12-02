@@ -60,14 +60,9 @@ FitGompertz <- function(gdat) {
   startPar <- c(b0 = 1, b1 = 1, g0 = 1, g1 = 1, b = 7, sig2 = .25)
   lowerBound <- c(b0 = 1e-8, b1 = 1e-8, g0 = 1e-8, g1 = 1e-8, b = 1e-8, sig2 = 1e-8)
   upperBound <- c(b0 = 10, b1 = 10, g0 = 10, g1 = 10, b = 15, sig2 = 10)
-  fit <- optim(
-    par = startPar,
-    fn = toOptim,
-    dat = gdat,  
-    lower = lowerBound,
-    upper = upperBound,
-    method = "L-BFGS-B",
-    control = list(fnscale = -1, maxit = 5000)  
+  fit2 <- nlminb(start = startPar, objective = toOptim, dat = gdat, 
+                 control = list(eval.max = 5000, iter.max = 5000),
+                 lower = lowerBound, upper = upperBound
   )
   
   # if (fit$convergence != "0") {
@@ -82,5 +77,5 @@ FitGompertz <- function(gdat) {
   
   
   
-  return(fit$par[1:4])
+  return(fit2$par[1:4])
 }
